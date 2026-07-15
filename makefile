@@ -1,17 +1,17 @@
 CC  =gcc
 CFLAGS=-Wall
 
-queuetree.o: queuetree.c helper.h
-	$(CC) $(CFLAGS) -c queuetree.c
-helper.o: helper.c helper.h
-	$(CC) $(CFLAGS) -c helper.c
+star-catalog.o: src/star-catalog.c src/helper.h
+	$(CC) $(CFLAGS) -c src/star-catalog.c
+helper.o: src/helper.c src/helper.h
+	$(CC) $(CFLAGS) -c src/helper.c
 
-main: queuetree.o helper.o
-	$(CC) $(CFLAGS) queuetree.o helper.o -o queue
+main: star-catalog.o helper.o
+	$(CC) $(CFLAGS) star-catalog.o helper.o -o star-catalog
 
 
 run: main
-	./queue
+	./star-catalog
 
 clean:
-	rm -rf *.o queue
+	rm -rf *.o star-catalog
