@@ -1,0 +1,4 @@
+*.o
+queue
+star_catalog
+data/raw/*.csv
