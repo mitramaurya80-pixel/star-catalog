@@ -61,3 +61,40 @@ int data_entry(struct Node** node, struct CelestialObject data) {
         
   
 }
+
+int load_data_from_csv(struct Node** root, const char* filename){
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Could not open file %s\n", filename);
+        return -1; // File opening failed
+    }
+    char lines[256];
+    // Skip the header line
+    fgets(lines, sizeof(lines), file);
+    while(fgets(lines,sizeof(lines),file)){
+        struct CelestialObject* obj;
+        char name[50];
+        float distance_ly;
+        char type[20];
+        int discovery_year;
+
+        if (sscanf(lines, "%49[^,],%f,%19[^,],%d", name, &distance_ly, type, &discovery_year) != 4) {
+            printf("Invalid line format: %s", lines);
+            continue; // Skip to the next line
+        }
+
+        if (CelestialObject_create(&obj, name, distance_ly, type, discovery_year) != 0) {
+            printf("Failed to create celestial object from line: %s", lines);
+            continue; // Skip to the next line
+        }
+
+        if (data_entry(root, *obj) != 0) {
+            printf("Failed to insert celestial object into the tree from line: %s", lines);
+            free(obj); // Free the allocated memory for obj
+            continue; // Skip to the next line
+        }
+
+    }
+    return 0; // Success
+
+}

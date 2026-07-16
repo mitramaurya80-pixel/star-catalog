@@ -8,7 +8,8 @@ def clean_data(input_file, output_file):
     #read the input CSV file into a DataFrame
     df=pd.read_csv(input_file,comment='#',skiprows=1)  
     df_clean= df[["pl_name","disc_year","sy_dist"]].copy()  # select relevant columns
-    df_clean.dropna(subset=["sy_dist"])  # remove rows with missing values in the "sy_dist" column
+    df_clean["pl_name"]=df_clean["pl_name"].str.replace(" ","_",regex=False) # replace spaces with underscores in the "pl_name" column
+    df_clean.dropna(subset=["sy_dist"], inplace=True)  # remove rows with missing values in the "sy_dist" column
     df_clean["sy_dist"] = df_clean["sy_dist"]*3.26   # convert sy_dist from parsecs to light-years
     #Add a new column for exoplanet 
     df_clean["type"] = "exoplanet"
