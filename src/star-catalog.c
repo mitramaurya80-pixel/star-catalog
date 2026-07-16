@@ -17,7 +17,13 @@ int main(){
         if (scanf("%s", name) != 1 || strcmp(name, "exit") == 0) {
             break; // Exit the loop if user types 'exit'
         }
-        scanf("%f %s %d", &distance_ly, type, &discovery_year);
+        if(scanf("%f %s %d", &distance_ly, type, &discovery_year) != 3) {
+            printf("Invalid input. Please enter all required details.\n");
+            // Clear the input buffer
+            int ch;
+            while((ch = getchar()) != '\n' && ch != EOF);
+            continue; // Skip to the next iteration
+        }
 
         if (CelestialObject_create(&obj, name, distance_ly, type, discovery_year) != 0) {
             printf("Failed to create celestial object.\n");
@@ -30,8 +36,11 @@ int main(){
             continue; // Skip to the next iteration
         }
         printf("Celestial object '%s' inserted successfully.\n", name);
-        free(obj); // Free the allocated memory for obj after insertion
+        
     }
+    inorderTraversal(root);
+    free(root); // Free the allocated memory for the tree
+    return 0;
 
 }
 

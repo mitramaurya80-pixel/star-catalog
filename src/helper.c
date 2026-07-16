@@ -18,6 +18,16 @@ int CelestialObject_create(struct CelestialObject** obj, const char* name, float
     return 0; // Success
 }
 
+void inorderTraversal(struct Node* node) {
+    if (node == NULL) {
+        return;
+    }
+    inorderTraversal(node->left);
+    printf("Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
+           node->data.name, node->data.distance_ly, node->data.type, node->data.discovery_year);
+    inorderTraversal(node->right);
+}
+
 int createNode(struct Node** node, struct CelestialObject data) {
     *node = (struct Node*)malloc(sizeof(struct Node));
     if (*node == NULL) {
@@ -37,13 +47,17 @@ int data_entry(struct Node** node, struct CelestialObject data) {
         int result = createNode(node, data);
         return result; // Return the result of node creation
     }
-        if (data.distance_ly < (*node)->data.distance_ly) {
+    if (data.distance_ly < (*node)->data.distance_ly) {
+        return data_entry(&((*node)->left), data);
+    }else if (data.distance_ly > (*node)->data.distance_ly) {
+        return data_entry(&((*node)->right), data);
+    }else {
+        // Distances are equal, so use name as a tie-breaker.
+        if (strcmp(data.name, (*node)->data.name) < 0)
             return data_entry(&((*node)->left), data);
-        } else if(strcmp(data.name, (*node)->data.name) < 0) {
-            return data_entry(&((*node)->left), data);
-        } else {
+        else
             return data_entry(&((*node)->right), data);
-        }
+    }
         
   
 }
