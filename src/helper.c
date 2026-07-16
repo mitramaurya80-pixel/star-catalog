@@ -98,3 +98,19 @@ int load_data_from_csv(struct Node** root, const char* filename){
     return 0; // Success
 
 }
+
+int search_by_exact_distance(struct Node* node, float distance_ly) {
+    if (node == NULL) {
+        return 1; // Not found
+    }
+    if (node->data.distance_ly == distance_ly) {
+        printf("Found: Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
+               node->data.name, node->data.distance_ly, node->data.type, node->data.discovery_year);
+        return 0; // Found
+    } else if (distance_ly < node->data.distance_ly) {
+        return search_by_exact_distance(node->left, distance_ly);
+    } else {
+        return search_by_exact_distance(node->right, distance_ly);
+    }
+
+}

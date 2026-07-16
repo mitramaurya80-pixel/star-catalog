@@ -21,6 +21,7 @@ int data_entry(struct Node** node, struct CelestialObject data);
 int CelestialObject_create(struct CelestialObject** obj, const char* name, float distance_ly, const char* type, int discovery_year);
 void inorderTraversal(struct Node* node);
 int load_data_from_csv(struct Node** root, const char* filename);
+int search_by_exact_distance(struct Node* node, float distance_ly);
 
 
 #endif // QUEUE_TREE_H
