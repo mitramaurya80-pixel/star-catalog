@@ -1,7 +1,10 @@
 #ifndef QUEUE_TREE_H
 #define QUEUE_TREE_H
 
-
+struct queueNode {
+    struct Node* treeNode;
+    struct queueNode* next;
+};
 
 struct  CelestialObject {
     char name[50];
@@ -22,6 +25,9 @@ int CelestialObject_create(struct CelestialObject** obj, const char* name, float
 void inorderTraversal(struct Node* node);
 int load_data_from_csv(struct Node** root, const char* filename);
 int search_by_exact_distance(struct Node* node, float distance_ly);
+int leveorderTraversal(struct Node* node);
+int distance_range_search(struct Node* node, float min_distance, float max_distance);
+int deleteObj(struct Node** root, float distance_ly);
 
 
 #endif // QUEUE_TREE_H

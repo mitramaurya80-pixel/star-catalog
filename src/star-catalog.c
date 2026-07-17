@@ -70,12 +70,25 @@ int main(){
                 break;
             case 4:
                 // Display level order
+                leveorderTraversal(root);
                 break;
             case 5:
                 // Search by distance range
+                float min_distance, max_distance;
+                printf("Searching for objects within the distance range of 0 to 100 light-years:\n");
+                scanf("%f %f", &min_distance, &max_distance);
+                distance_range_search(root, min_distance, max_distance);
                 break;
             case 6:
                 // Delete object
+                float delete_distance;
+                printf("Enter the distance of the object to delete: ");
+                scanf("%f", &delete_distance);
+                if (deleteObj(&root, delete_distance) != 0) {
+                    printf("Object not found or could not be deleted.\n");
+                } else {
+                    printf("Object deleted successfully.\n");
+                }
                 break;
             case 7:
                 // Save to CSV
@@ -85,13 +98,14 @@ int main(){
                 break;
             case 9:
                 // Exit
-                free(root); // Free the allocated memory for the tree
+                break;
             default:
                 printf("Invalid choice. Please try again.\n");
     }
+    
+    }
     free(root); // Free the allocated memory for the tree
     return 0;
-    }
 }
 
 

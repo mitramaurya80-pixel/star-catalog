@@ -11,6 +11,7 @@ def clean_data(input_file, output_file):
     df_clean["pl_name"]=df_clean["pl_name"].str.replace(" ","_",regex=False) # replace spaces with underscores in the "pl_name" column
     df_clean.dropna(subset=["sy_dist"], inplace=True)  # remove rows with missing values in the "sy_dist" column
     df_clean["sy_dist"] = df_clean["sy_dist"]*3.26   # convert sy_dist from parsecs to light-years
+    df_clean["sy_dist"] = df_clean["sy_dist"].round(3)  # round the "sy_dist" column to 3 decimal places
     #Add a new column for exoplanet 
     df_clean["type"] = "exoplanet"
 

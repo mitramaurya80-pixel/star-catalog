@@ -3,6 +3,9 @@
 #include "helper.h"
 #include <string.h>
 
+static struct queueNode* front=NULL;
+static struct queueNode* rear=NULL;
+
 
 int CelestialObject_create(struct CelestialObject** obj, const char* name, float distance_ly, const char* type, int discovery_year) {
     *obj = (struct CelestialObject*)malloc(sizeof(struct CelestialObject));
@@ -113,4 +116,101 @@ int search_by_exact_distance(struct Node* node, float distance_ly) {
         return search_by_exact_distance(node->right, distance_ly);
     }
 
+}
+static int enqueue(struct Node* node){
+
+    if(node==NULL){
+        printf("x--------------Empety tree---------------x");
+        return 1;
+    }
+    if(front==NULL){
+        front=(struct queueNode*)malloc(sizeof(struct queueNode));
+        front->treeNode=node;
+        front->next=NULL;
+        rear=front;
+    }else{
+        struct queueNode* newNode=(struct queueNode*)malloc(sizeof(struct queueNode));
+        newNode->treeNode=node;
+        newNode->next=NULL;
+        rear->next=newNode;
+        rear=newNode;
+    }
+    return 0;
+
+}
+static int dequeue(){
+    if(front==NULL){
+        printf("Queue is empty. Cannot dequeue.\n");
+        return 1;
+    }
+    struct queueNode* temp=front;
+    front=front->next;
+    free(temp);
+    if(front==NULL){
+        rear=NULL;
+    }
+    return 0;
+}
+int leveorderTraversal(struct Node* node){
+    if(node==NULL){
+        printf("Tree is empty.\n");
+        return 1;
+    }
+    enqueue(node);
+    while(front!=NULL){
+        struct Node* current=front->treeNode;
+        printf("Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
+               current->data.name, current->data.distance_ly, current->data.type, current->data.discovery_year);
+        if(current->left!=NULL){
+            enqueue((current->left));
+        }
+        if(current->right!=NULL){
+            enqueue((current->right));
+        }
+        dequeue();
+    }
+
+    return 0;
+}
+int distance_range_search(struct Node* node, float min_distance, float max_distance) {
+    if (node == NULL) {
+        return 1; // Not found
+    }
+    if (node->data.distance_ly >= min_distance && node->data.distance_ly <= max_distance) {
+        printf("Found: Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
+               node->data.name, node->data.distance_ly, node->data.type, node->data.discovery_year);
+    }
+    distance_range_search(node->left, min_distance, max_distance);
+    distance_range_search(node->right, min_distance, max_distance);
+    return 0; // Success
+}
+int deleteObj(struct Node** root, float distance_ly) {
+    if(*root==NULL){
+        return 1; // Not found
+    }
+    while(1){
+        if(distance_ly < (*root)->data.distance_ly){
+            root = &((*root)->left);
+        }else if(distance_ly > (*root)->data.distance_ly){
+            root = &((*root)->right);
+        }else{
+            strcmp((*root)->data.name, (*root)->data.name) == 0; // Check for name match
+            
+        }
+    }
+    struct Node* temp = *root;
+    if(temp->left == NULL){
+        *root = temp->right;
+    }else if(temp->right == NULL){
+        *root = temp->left;
+    }else{
+        struct Node* successor = temp->right;
+        while(successor->left != NULL){
+            successor = successor->left;
+        }
+        temp->data = successor->data;
+        deleteObj(&temp->right, successor->data.distance_ly);
+    }
+    free(temp);
+    return 0; // Success
 }
