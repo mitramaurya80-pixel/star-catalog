@@ -1,9 +1,9 @@
 CC  =gcc
 CFLAGS=-Wall
 
-star-catalog.o: src/star-catalog.c src/helper.h
+star-catalog.o: src/star-catalog.c include/helper.h
 	$(CC) $(CFLAGS) -c src/star-catalog.c
-helper.o: src/helper.c src/helper.h
+helper.o: src/helper.c include/helper.h
 	$(CC) $(CFLAGS) -c src/helper.c
 
 main: star-catalog.o helper.o

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "helper.h"
+#include "../include/helper.h"
 #include <string.h>
 
 static struct queueNode* front=NULL;
