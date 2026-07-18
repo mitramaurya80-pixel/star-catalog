@@ -7,6 +7,7 @@ static struct queueNode* front=NULL;
 static struct queueNode* rear=NULL;
 
 
+
 int CelestialObject_create(struct CelestialObject** obj, const char* name, float distance_ly, const char* type, int discovery_year) {
     *obj = (struct CelestialObject*)malloc(sizeof(struct CelestialObject));
     if (*obj == NULL) {
@@ -26,7 +27,7 @@ void inorderTraversal(struct Node* node) {
         return;
     }
     inorderTraversal(node->left);
-    printf("Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
+    printf("Name: %s, Distance: %.3f ly, Type: %s, Discovery Year: %d\n",
            node->data.name, node->data.distance_ly, node->data.type, node->data.discovery_year);
     inorderTraversal(node->right);
 }
@@ -96,25 +97,48 @@ int load_data_from_csv(struct Node** root, const char* filename){
             free(obj); // Free the allocated memory for obj
             continue; // Skip to the next line
         }
+        free(obj); // Free the allocated memory for obj after insertion
 
     }
+    fclose(file);
     return 0; // Success
 
 }
 
-int search_by_exact_distance(struct Node* node, float distance_ly) {
-    if (node == NULL) {
-        return 1; // Not found
+struct msg * search_by_exact_distance(struct Node* node, float distance_ly) {
+    struct Node* prev = NULL;
+    struct msg* msg_=(struct msg*)malloc(sizeof(struct msg));
+    if(msg_==NULL){
+        printf("Memory allocation failed for msg\n");
+        return NULL; // Memory allocation failed
     }
-    if (node->data.distance_ly == distance_ly) {
-        printf("Found: Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
-               node->data.name, node->data.distance_ly, node->data.type, node->data.discovery_year);
-        return 0; // Found
-    } else if (distance_ly < node->data.distance_ly) {
-        return search_by_exact_distance(node->left, distance_ly);
-    } else {
-        return search_by_exact_distance(node->right, distance_ly);
+    if(node == NULL) {
+        return NULL; // Not found
     }
+    struct Node* current = node;
+    while(current !=NULL && current->data.distance_ly != distance_ly) {
+        prev = current;
+        if(distance_ly < current->data.distance_ly) {
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+    if(current != NULL) {
+        printf("Found: Name: %s, Distance: %.3f ly, Type: %s, Discovery Year: %d\n",
+               current->data.name, current->data.distance_ly, current->data.type, current->data.discovery_year);
+    }else{
+        printf("Object with distance %.2f not found.\n", distance_ly);
+    }
+
+    msg_->node =(struct Node**)malloc(sizeof(struct Node*));
+    if(msg_->node==NULL){
+        free(msg_);
+        return NULL; // Memory allocation failed
+    }
+    *(msg_->node) = current;
+    msg_->prev = prev;
+    return msg_;
 
 }
 static int enqueue(struct Node* node){
@@ -184,33 +208,80 @@ int distance_range_search(struct Node* node, float min_distance, float max_dista
     distance_range_search(node->right, min_distance, max_distance);
     return 0; // Success
 }
-int deleteObj(struct Node** root, float distance_ly) {
+static struct Node* findMin(struct Node* node) {
+    while (node->left != NULL) {
+        node = node->left;
+    }
+    return node;
+}
+static struct Node* delete_recursive(struct Node* root,const char* name, float distance_ly,int* found) {
+    if (root == NULL) {
+        return root; // Not found
+    }
+    if (distance_ly < root->data.distance_ly) {
+        root->left = delete_recursive(root->left, name, distance_ly, found);
+    } else if (distance_ly > root->data.distance_ly) {
+        root->right = delete_recursive(root->right, name, distance_ly, found);
+    } else {
+        // Found the node to be deleted
+        int name_match = strcmp(name, root->data.name);
+        if (name_match<0) {
+            // Names do not match, continue searching in the right subtree
+            root->left = delete_recursive(root->left, name, distance_ly, found);
+        }else if (name_match>0) {
+            // Names do not match, continue searching in the left subtree
+            root->right = delete_recursive(root->right, name, distance_ly, found);
+        } else {
+            *found = 1; // Mark as found
+        
+
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+        // Node with two children: Get the inorder successor (smallest in the right subtree)
+        struct Node* temp = findMin(root->right);
+        // Copy the inorder successor's content to this node
+        root->data = temp->data;
+        // Delete the inorder successor
+        root->right = delete_recursive(root->right, temp->data.name, temp->data.distance_ly, found);
+    }
+    }
+
+    return root;
+}
+int deleteObj(struct Node** root,const char* name, float distance_ly) {
     if(*root==NULL){
         return 1; // Not found
     }
-    while(1){
-        if(distance_ly < (*root)->data.distance_ly){
-            root = &((*root)->left);
-        }else if(distance_ly > (*root)->data.distance_ly){
-            root = &((*root)->right);
-        }else{
-            strcmp((*root)->data.name, (*root)->data.name) == 0; // Check for name match
-            
-        }
+    int found = 0;
+    *root = delete_recursive(*root, name, distance_ly, &found);
+
+    return found ? 0 : 1; // Return 0 if found and deleted, 1 if not found
+}
+
+int save_to_csv(struct Node* node, FILE* file) {
+    if (node == NULL) {
+        return 1; // Not found
     }
-    struct Node* temp = *root;
-    if(temp->left == NULL){
-        *root = temp->right;
-    }else if(temp->right == NULL){
-        *root = temp->left;
-    }else{
-        struct Node* successor = temp->right;
-        while(successor->left != NULL){
-            successor = successor->left;
-        }
-        temp->data = successor->data;
-        deleteObj(&temp->right, successor->data.distance_ly);
+    fprintf(file, "%s,%.3f,%s,%d\n", node->data.name, node->data.distance_ly, node->data.type, node->data.discovery_year);
+    save_to_csv(node->left, file);
+    save_to_csv(node->right, file);
+    return 0; // Success
+}
+
+int freeTree(struct Node* node) {
+    if (node == NULL) {
+        return 1; // Not found
     }
-    free(temp);
+    freeTree(node->left);
+    freeTree(node->right);
+    free(node);
     return 0; // Success
 }

@@ -18,16 +18,23 @@ struct Node {
     struct Node* left;
     struct Node* right;
 };
+struct msg{
+        struct Node** node;
+        struct Node* prev;
+    };
 
 int createNode(struct Node** node, struct CelestialObject data);
 int data_entry(struct Node** node, struct CelestialObject data);
 int CelestialObject_create(struct CelestialObject** obj, const char* name, float distance_ly, const char* type, int discovery_year);
 void inorderTraversal(struct Node* node);
 int load_data_from_csv(struct Node** root, const char* filename);
-int search_by_exact_distance(struct Node* node, float distance_ly);
+struct msg *search_by_exact_distance(struct Node* node, float distance_ly);
 int leveorderTraversal(struct Node* node);
 int distance_range_search(struct Node* node, float min_distance, float max_distance);
-int deleteObj(struct Node** root, float distance_ly);
+int deleteObj(struct Node** root, const char* name, float distance_ly);
+int save_to_csv(struct Node* node, FILE* file);
+int load_csv(struct Node** root, const char* filename);
+int freeTree(struct Node* node);
 
 
 #endif // QUEUE_TREE_H
