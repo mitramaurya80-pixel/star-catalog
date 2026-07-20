@@ -112,9 +112,7 @@ struct msg * search_by_exact_distance(struct Node* node, float distance_ly) {
         printf("Memory allocation failed for msg\n");
         return NULL; // Memory allocation failed
     }
-    if(node == NULL) {
-        return NULL; // Not found
-    }
+   
     struct Node* current = node;
     while(current !=NULL && current->data.distance_ly != distance_ly) {
         prev = current;
