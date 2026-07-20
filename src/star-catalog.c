@@ -63,7 +63,7 @@ int main(){
                 printf("Enter the distance to search for: ");
                 if(scanf("%f", &search_distance) == 1) {
                     struct msg     *result = search_by_exact_distance(root, search_distance);
-                    if(result->node == NULL) {
+                    if(*(result->node) == NULL) {
                         printf("Object with distance %.2f not found.\n", search_distance);
                     } else {
                         printf("Found object: Name: %s, Distance: %.2f ly, Type: %s, Discovery Year: %d\n",
